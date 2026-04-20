@@ -450,20 +450,15 @@ function teamLogo(abbrev) {
 async function fetchLiveStats() {
   const statusEl = document.getElementById('status-msg');
   const updEl    = document.getElementById('upd-time');
+  // Use Netlify function when hosted, fall back to direct for local dev
+  const isHosted  = location.hostname !== 'localhost' && location.protocol !== 'file:';
   const directUrl = 'https://api-web.nhle.com/v1/skater-stats-leaders/20252026/3?categories=points&limit=100';
-  const proxyUrl  = `https://corsproxy.io/?url=${encodeURIComponent(directUrl)}`;
+  const fetchUrl  = isHosted ? '/.netlify/functions/nhl-stats' : directUrl;
   try {
-    // Try direct first, fall back to CORS proxy
     let d;
-    try {
-      const r = await fetch(directUrl, { cache:'no-store' });
-      if (!r.ok) throw new Error('direct failed');
-      d = await r.json();
-    } catch {
-      const r = await fetch(proxyUrl, { cache:'no-store' });
-      if (!r.ok) throw new Error('proxy failed');
-      d = await r.json();
-    }
+    const r = await fetch(fetchUrl, { cache:'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    d = await r.json();
 
     if (d.points && d.points.length > 0) {
       d.points.forEach(pl => {
@@ -727,20 +722,14 @@ async function fetchScores() {
   try {
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-    const directUrl = `https://api-web.nhle.com/v1/score/${dateStr}`;
-    const proxyUrl  = `https://corsproxy.io/?url=${encodeURIComponent(directUrl)}`;
+    const isHosted  = location.hostname !== 'localhost' && location.protocol !== 'file:';
+    const fetchUrl  = isHosted
+      ? `/.netlify/functions/nhl-scores?date=${dateStr}`
+      : `https://api-web.nhle.com/v1/score/${dateStr}`;
 
-    // Try direct first (works from local/same-origin), fall back to proxy (works from Netlify)
-    let d;
-    try {
-      const r = await fetch(directUrl, { cache:'no-store' });
-      if (!r.ok) throw new Error('direct failed');
-      d = await r.json();
-    } catch {
-      const r = await fetch(proxyUrl, { cache:'no-store' });
-      if (!r.ok) throw new Error('proxy failed');
-      d = await r.json();
-    }
+    const r = await fetch(fetchUrl, { cache:'no-store' });
+    if (!r.ok) throw new Error('no data');
+    const d = await r.json();
 
     if (!d.games || d.games.length === 0) {
       el.innerHTML = `<div style="color:var(--muted);font-size:.9rem;padding:8px">No games scheduled today.</div>`;
