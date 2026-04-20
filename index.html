@@ -162,6 +162,44 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui
 .p-pts { font-size:1.1rem; font-weight:900; min-width:30px; text-align:right; color:var(--navy); }
 .p-pts.hot { color:var(--red); }
 
+/* ── SCORES ── */
+.scores-grid {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  margin-bottom: 32px;
+}
+.score-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; flex: 1 1 220px; max-width: 280px;
+  box-shadow: 0 2px 12px rgba(0,38,84,.08);
+  transition: transform .18s, box-shadow .18s;
+}
+.score-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,38,84,.13); }
+.score-card.live { border-top: 3px solid var(--red); }
+.score-card.final { border-top: 3px solid var(--navy); }
+.score-card.pre   { border-top: 3px solid #94a3b8; }
+.sc-status {
+  font-size: .68rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; padding: 6px 14px; text-align: center;
+}
+.sc-status.live { background: var(--red); color: #fff; }
+.sc-status.final { background: var(--navy); color: #fff; }
+.sc-status.pre   { background: #e2e8f0; color: var(--muted); }
+.sc-teams {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; gap: 8px;
+}
+.sc-team { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+.sc-team img { width: 48px; height: 48px; object-fit: contain; }
+.sc-team-abbrev { font-size: .72rem; font-weight: 700; color: var(--muted); }
+.sc-score { font-size: 2rem; font-weight: 900; color: var(--navy); }
+.sc-score.winning { color: var(--red); }
+.sc-vs { font-size: .75rem; color: var(--muted); font-weight: 600; flex-shrink: 0; }
+.sc-series {
+  font-size: .7rem; color: var(--muted); text-align: center;
+  padding: 0 14px 10px; line-height: 1.5;
+}
+.sc-series strong { color: var(--navy); }
+
 /* ── TRASH TALK ── */
 .trash-box {
   background: var(--card);
@@ -230,6 +268,12 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui
         <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Loading…</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- LIVE SCORES -->
+  <div class="section-head">🚨 Today's Games</div>
+  <div class="scores-grid" id="scores-grid">
+    <div style="color:var(--muted);font-size:.9rem">Loading scores…</div>
   </div>
 
   <!-- DAILY SUMMARY -->
@@ -668,6 +712,90 @@ function renderAll() {
 }
 
 // ================================================================
+// LIVE SCORES
+// ================================================================
+async function fetchScores() {
+  const el = document.getElementById('scores-grid');
+  try {
+    // Use today's date in ET (NHL schedule date)
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD
+    const r = await fetch(`https://api-web.nhle.com/v1/score/${dateStr}`, { cache:'no-store' });
+    if (!r.ok) throw new Error('no data');
+    const d = await r.json();
+
+    if (!d.games || d.games.length === 0) {
+      el.innerHTML = `<div style="color:var(--muted);font-size:.9rem;padding:8px">No games scheduled today.</div>`;
+      return;
+    }
+
+    el.innerHTML = d.games.map(g => {
+      const awayWin = g.awayTeam.score > g.homeTeam.score;
+      const homeWin = g.homeTeam.score > g.awayTeam.score;
+      const isLive  = g.gameState === 'LIVE' || g.gameState === 'CRIT';
+      const isFinal = g.gameState === 'OFF' || g.gameState === 'FINAL';
+      const isPre   = g.gameState === 'PRE'  || g.gameState === 'FUT';
+
+      // Status label
+      let statusText = '';
+      let statusClass = 'pre';
+      if (isFinal) {
+        const ot = g.gameOutcome?.lastPeriodType;
+        statusText = 'Final' + (ot === 'OT' ? '/OT' : ot === 'SO' ? '/SO' : '');
+        statusClass = 'final';
+      } else if (isLive) {
+        const pd = g.periodDescriptor;
+        const perLabel = pd?.periodType === 'OT' ? 'OT'
+                       : pd?.periodType === 'SO' ? 'SO'
+                       : `P${pd?.number || g.period}`;
+        statusText = `🔴 LIVE · ${perLabel} ${g.clock?.timeRemaining || ''}`;
+        statusClass = 'live';
+      } else {
+        // Pre-game — show local start time
+        const start = new Date(g.startTimeUTC);
+        statusText = start.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
+        statusClass = 'pre';
+      }
+
+      // Series record
+      const s = g.seriesStatus;
+      let seriesHTML = '';
+      if (s) {
+        const topName  = s.topSeedTeamAbbrev;
+        const botName  = s.bottomSeedTeamAbbrev;
+        const topW = s.topSeedWins, botW = s.bottomSeedWins;
+        const leader = topW > botW ? topName : botW > topW ? botName : null;
+        seriesHTML = leader
+          ? `<strong>${leader}</strong> leads series ${Math.max(topW,botW)}-${Math.min(topW,botW)}`
+          : `Series tied ${topW}-${botW}`;
+      }
+
+      return `
+        <div class="score-card ${statusClass}">
+          <div class="sc-status ${statusClass}">${statusText}</div>
+          <div class="sc-teams">
+            <div class="sc-team">
+              <img src="${g.awayTeam.logo}" onerror="this.style.display='none'" alt="${g.awayTeam.abbrev}">
+              <div class="sc-team-abbrev">${g.awayTeam.abbrev}</div>
+              <div class="sc-score${awayWin && isFinal ? ' winning' : ''}">${g.awayTeam.score ?? '—'}</div>
+            </div>
+            <div class="sc-vs">vs</div>
+            <div class="sc-team">
+              <img src="${g.homeTeam.logo}" onerror="this.style.display='none'" alt="${g.homeTeam.abbrev}">
+              <div class="sc-team-abbrev">${g.homeTeam.abbrev}</div>
+              <div class="sc-score${homeWin && isFinal ? ' winning' : ''}">${g.homeTeam.score ?? '—'}</div>
+            </div>
+          </div>
+          ${seriesHTML ? `<div class="sc-series">${seriesHTML}</div>` : ''}
+        </div>`;
+    }).join('');
+
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--muted);font-size:.9rem;padding:8px">Scores unavailable — open in browser for live data.</div>`;
+  }
+}
+
+// ================================================================
 // INIT
 // ================================================================
 function seedFromSnapshot() {
@@ -682,7 +810,11 @@ function seedFromSnapshot() {
 seedFromSnapshot();
 renderAll();
 fetchLiveStats();
+fetchScores();
+
+// Pool stats refresh every 5 min, scores every 30 sec
 setInterval(fetchLiveStats, 5 * 60 * 1000);
+setInterval(fetchScores, 30 * 1000);
 </script>
 </body>
 </html>
