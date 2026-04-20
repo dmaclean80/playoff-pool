@@ -838,9 +838,20 @@ renderAll();
 fetchLiveStats();
 fetchScores();
 
-// Pool stats refresh every 5 min, scores every 30 sec
-setInterval(fetchLiveStats, 5 * 60 * 1000);
-setInterval(fetchScores, 30 * 1000);
+// Refresh intervals — paused when tab is in background
+const STATS_INTERVAL  = 60 * 60 * 1000;  // 1 hour
+const SCORES_INTERVAL = 10 * 60 * 1000;  // 10 minutes
+
+let statsTimer  = setInterval(() => { if (!document.hidden) fetchLiveStats(); }, STATS_INTERVAL);
+let scoresTimer = setInterval(() => { if (!document.hidden) fetchScores();    }, SCORES_INTERVAL);
+
+// Resume immediately when user switches back to this tab
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    fetchScores();
+    fetchLiveStats();
+  }
+});
 </script>
 </body>
 </html>
