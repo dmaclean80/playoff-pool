@@ -450,13 +450,21 @@ function teamLogo(abbrev) {
 async function fetchLiveStats() {
   const statusEl = document.getElementById('status-msg');
   const updEl    = document.getElementById('upd-time');
+  const directUrl = 'https://api-web.nhle.com/v1/skater-stats-leaders/20252026/3?categories=points&limit=100';
+  const proxyUrl  = `https://corsproxy.io/?url=${encodeURIComponent(directUrl)}`;
   try {
-    const r = await fetch(
-      'https://api-web.nhle.com/v1/skater-stats-leaders/20252026/3?categories=points&limit=100',
-      { cache:'no-store' }
-    );
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const d = await r.json();
+    // Try direct first, fall back to CORS proxy
+    let d;
+    try {
+      const r = await fetch(directUrl, { cache:'no-store' });
+      if (!r.ok) throw new Error('direct failed');
+      d = await r.json();
+    } catch {
+      const r = await fetch(proxyUrl, { cache:'no-store' });
+      if (!r.ok) throw new Error('proxy failed');
+      d = await r.json();
+    }
+
     if (d.points && d.points.length > 0) {
       d.points.forEach(pl => {
         const full = `${pl.firstName.default} ${pl.lastName.default}`;
@@ -469,8 +477,8 @@ async function fetchLiveStats() {
       throw new Error('empty');
     }
   } catch(e) {
-    updEl.textContent    = 'Showing snapshot data · open in a browser for live updates';
-    statusEl.textContent = 'NHL API blocked (local file) — showing last snapshot';
+    updEl.textContent    = 'Showing snapshot data — stats will refresh shortly';
+    statusEl.textContent = 'Using snapshot data · live API temporarily unavailable';
   }
   renderAll();
 }
