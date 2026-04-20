@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHL Playoff Pool 2025</title>
+<style>
+:root {
+  --red:    #CE1126;
+  --navy:   #002654;
+  --blue:   #0057B8;
+  --bg:     #f0f4f8;
+  --card:   #ffffff;
+  --border: #dce3ed;
+  --text:   #0f1f33;
+  --muted:  #6b7a8d;
+  --green:  #15803d;
+  --stripe: #f7f9fc;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; }
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, var(--navy) 0%, #003580 50%, var(--navy) 100%);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 18px,
+      rgba(255,255,255,.03) 18px,
+      rgba(255,255,255,.03) 36px
+    );
+}
+.header-top {
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  padding: 32px 24px 20px;
+  position:relative; gap:12px;
+}
+.header-logo {
+  height: 72px; width: auto;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.4));
+}
+.header h1 {
+  font-size: clamp(1.6rem,3.5vw,2.5rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.5px;
+  text-align:center;
+}
+.header-stripe {
+  height: 6px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--red) 50%, #fff 50%, #fff 52%, var(--red) 52%, var(--red) 100%);
+}
+.header-meta {
+  background: rgba(0,0,0,.25);
+  color: rgba(255,255,255,.8);
+  font-size:.85rem;
+  padding: 8px 24px;
+  display:flex; justify-content:center; gap:16px; flex-wrap:wrap;
+}
+.live-dot {
+  display:inline-block; width:7px; height:7px;
+  background:#f87171; border-radius:50%; margin-right:5px;
+  animation: blink 1.4s infinite; vertical-align:middle;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* ── LAYOUT ── */
+.wrap { max-width:1440px; margin:0 auto; padding:28px 20px; }
+.section-head {
+  font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:2.5px;
+  color: var(--navy); margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-head::after { content:''; flex:1; height:2px; background:linear-gradient(90deg,var(--red),transparent); }
+
+/* ── LEADERBOARD ── */
+.lb-wrap {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden; margin-bottom:32px;
+  box-shadow: 0 2px 12px rgba(0,38,84,.08);
+}
+.lb-wrap table { width:100%; border-collapse:collapse; }
+.lb-wrap thead { background: var(--navy); }
+.lb-wrap th {
+  color: rgba(255,255,255,.75);
+  font-size:.72rem; text-transform:uppercase; letter-spacing:1px;
+  padding:12px 18px; text-align:left; white-space:nowrap;
+}
+.lb-wrap td { padding:13px 18px; border-bottom:1px solid var(--border); }
+.lb-wrap tr:last-child td { border-bottom:none; }
+.lb-wrap tr.data:nth-child(even) td { background:var(--stripe); }
+.lb-wrap tr.data:hover td { background:#eef3fb; }
+.lb-rank { font-size:1.3rem; line-height:1; }
+.lb-name { font-weight:700; font-size:1rem; color:var(--navy); }
+.lb-pts  { font-size:1.35rem; font-weight:900; color:var(--red); }
+.lb-week { font-weight:700; }
+.pos { color:var(--green); }
+.neg { color:var(--red); }
+.neu { color:var(--muted); }
+.color-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; flex-shrink:0; }
+
+/* ── WEEK NAV ── */
+.week-box {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:24px; margin-bottom:32px;
+  box-shadow: 0 2px 12px rgba(0,38,84,.08);
+}
+.week-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.week-nav button {
+  background:var(--navy); border:none; color:#fff;
+  padding:8px 18px; border-radius:8px; cursor:pointer; font-size:.85rem; font-weight:600;
+  transition:background .18s;
+}
+.week-nav button:hover { background:var(--red); }
+.week-label { font-size:1.1rem; font-weight:800; color:var(--navy); }
+.week-body { color:#374151; line-height:1.8; font-size:.95rem; }
+.week-body strong { color:var(--navy); }
+
+/* ── TEAM GRID ── */
+.teams-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+  gap:18px; margin-bottom:32px;
+}
+.team-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+  box-shadow: 0 2px 12px rgba(0,38,84,.08);
+  transition:transform .18s, box-shadow .18s;
+}
+.team-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,38,84,.14); }
+.tc-head {
+  padding:14px 18px;
+  display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid var(--border);
+}
+.tc-name { font-size:1rem; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; }
+.tc-right { text-align:right; }
+.tc-pts { font-size:2rem; font-weight:900; color:var(--red); line-height:1; }
+.tc-rank { font-size:.72rem; color:var(--muted); margin-top:2px; }
+.player-list { padding:0 12px 12px; }
+.p-row {
+  display:flex; align-items:center; padding:7px 4px;
+  border-bottom:1px solid var(--border); gap:10px;
+}
+.p-row:last-child { border-bottom:none; }
+.p-logo {
+  width:32px; height:32px; object-fit:contain; flex-shrink:0;
+}
+.p-info { flex:1; min-width:0; }
+.p-name { font-size:.875rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text); }
+.p-team-pos { font-size:.7rem; color:var(--muted); }
+.p-pts { font-size:1.1rem; font-weight:900; min-width:30px; text-align:right; color:var(--navy); }
+.p-pts.hot { color:var(--red); }
+
+/* ── TRASH TALK ── */
+.trash-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--red);
+  border-radius:14px; padding:24px; margin-bottom:32px;
+  box-shadow: 0 2px 12px rgba(0,38,84,.08);
+}
+.tt-item {
+  background:var(--stripe); border-left:4px solid var(--red);
+  padding:12px 16px; margin-bottom:12px; border-radius:0 10px 10px 0;
+}
+.tt-item:last-child { margin-bottom:0; }
+.tt-who { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--red); margin-bottom:5px; }
+.tt-text { font-size:.925rem; line-height:1.65; color:#374151; }
+
+/* ── STATUS BAR ── */
+.status-bar {
+  background:var(--navy); color:rgba(255,255,255,.65);
+  padding:10px 24px; display:flex; justify-content:space-between;
+  font-size:.78rem; flex-wrap:wrap; gap:6px;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .wrap{padding:16px 12px}
+  .teams-grid{grid-template-columns:1fr}
+  .lb-wrap th,.lb-wrap td{padding:10px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <img class="header-logo"
+      src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg"
+      onerror="this.src='https://www.nhl.com/img/logolarge.jpg';this.onerror=null"
+      alt="NHL">
+    <h1>Playoff Pool 2025-26</h1>
+  </div>
+  <div class="header-stripe"></div>
+  <div class="header-meta">
+    <span><span class="live-dot"></span>Live Standings</span>
+    <span id="upd-time">Fetching data…</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- LEADERBOARD -->
+  <div class="section-head">🏆 Standings</div>
+  <div class="lb-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Manager</th>
+          <th>Total Pts</th>
+          <th>Today</th>
+          <th>Top Scorer</th>
+        </tr>
+      </thead>
+      <tbody id="lb-body">
+        <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DAILY SUMMARY -->
+  <div class="section-head">📅 Daily Summary</div>
+  <div class="week-box">
+    <div class="week-nav">
+      <button onclick="changeDay(-1)">◀ Prev</button>
+      <span class="week-label" id="wk-label">Day 1</span>
+      <button onclick="changeDay(1)">Next ▶</button>
+    </div>
+    <div class="week-body" id="wk-body">Loading…</div>
+  </div>
+
+  <!-- TEAM CARDS -->
+  <div class="section-head">👥 Team Rosters</div>
+  <div class="teams-grid" id="teams-grid"></div>
+
+  <!-- TRASH TALK -->
+  <div class="section-head" style="color:var(--red)">🔥 Trash Talk Corner</div>
+  <div class="trash-box" id="trash-box"></div>
+
+</div>
+
+<div class="status-bar">
+  <span>NHL Playoff Pool 2025-26</span>
+  <span id="status-msg">Connecting…</span>
+</div>
+
+<script>
+// ================================================================
+// ROSTER DATA
+// ================================================================
+const POOL = {
+  Cole: { color:'#2563eb', players:[
+    {n:'David Pastrnak',       t:'BOS', p:'RW'},
+    {n:'Morgan Geekie',        t:'BOS', p:'C'},
+    {n:'Wyatt Johnston',       t:'DAL', p:'C'},
+    {n:'Mikko Rantanen',       t:'DAL', p:'RW'},
+    {n:'Connor McDavid',       t:'EDM', p:'C'},
+    {n:'Kirill Kaprizov',      t:'MIN', p:'LW'},
+    {n:'Ryan Hartman',         t:'MIN', p:'RW'},
+    {n:'Darren Raddysh',       t:'TBL', p:'D'},
+    {n:'Gabriel Landeskog',    t:'COL', p:'LW'},
+    {n:'James Hagens',         t:'BOS', p:'C'},
+  ]},
+  Dave: { color:'#059669', players:[
+    {n:'Tage Thompson',        t:'BUF', p:'C'},
+    {n:'Alex Tuch',            t:'BUF', p:'RW'},
+    {n:'Nikolaj Ehlers',       t:'CAR', p:'LW'},
+    {n:'Nathan MacKinnon',     t:'COL', p:'C'},
+    {n:'Brock Nelson',         t:'COL', p:'C'},
+    {n:'Valeri Nichushkin',    t:'COL', p:'RW'},
+    {n:'Matt Duchene',         t:'DAL', p:'C'},
+    {n:'Marcus Johansson',     t:'MIN', p:'LW'},
+    {n:'Brandon Hagel',        t:'TBL', p:'LW'},
+    {n:'Anthony Cirelli',      t:'TBL', p:'C'},
+  ]},
+  Dean: { color:'#7c3aed', players:[
+    {n:'Rasmus Dahlin',        t:'BUF', p:'D'},
+    {n:'Seth Jarvis',          t:'CAR', p:'C'},
+    {n:'Martin Necas',         t:'COL', p:'C'},
+    {n:'Jason Robertson',      t:'DAL', p:'LW'},
+    {n:'Miro Heiskanen',       t:'DAL', p:'D'},
+    {n:'Leon Draisaitl',       t:'EDM', p:'C'},
+    {n:'Tim Stutzle',          t:'OTT', p:'C'},
+    {n:'Sidney Crosby',        t:'PIT', p:'C'},
+    {n:'Evgeni Malkin',        t:'PIT', p:'C'},
+    {n:'Matt Savoie',          t:'EDM', p:'RW'},
+  ]},
+  Jim: { color:'#b45309', players:[
+    {n:'Taylor Hall',          t:'CAR', p:'LW'},
+    {n:'Logan Stankoven',      t:'CAR', p:'C'},
+    {n:'Quinton Byfield',      t:'LAK', p:'C'},
+    {n:'Matt Boldy',           t:'MIN', p:'LW'},
+    {n:'Joel Eriksson Ek',     t:'MIN', p:'C'},
+    {n:'Brock Faber',          t:'MIN', p:'D'},
+    {n:'Jake Guentzel',        t:'TBL', p:'LW'},
+    {n:'Brayden Point',        t:'TBL', p:'C'},
+    {n:'Quinn Hughes',         t:'MIN', p:'D'},
+    {n:'Victor Hedman',        t:'TBL', p:'D'},
+  ]},
+  Mike: { color:'#be185d', players:[
+    {n:'Jack Quinn',           t:'BUF', p:'RW'},
+    {n:'Ryan Nugent-Hopkins',  t:'EDM', p:'C'},
+    {n:'Nick Suzuki',          t:'MTL', p:'C'},
+    {n:'Juraj Slafkovsky',     t:'MTL', p:'LW'},
+    {n:'Anthony Mantha',       t:'PIT', p:'RW'},
+    {n:'Pavel Dorofaev',       t:'VGK', p:'LW'},
+    {n:'Mitch Marner',         t:'VGK', p:'RW'},
+    {n:'Mark Stone',           t:'VGK', p:'RW'},
+    {n:'Ivan Barbashev',       t:'VGK', p:'LW'},
+    {n:'Tomas Hertl',          t:'VGK', p:'C'},
+  ]},
+  Neil: { color:'#0284c7', players:[
+    {n:'Cutter Gauthier',      t:'ANA', p:'LW'},
+    {n:'Cale Makar',           t:'COL', p:'D'},
+    {n:'Roope Hintz',          t:'DAL', p:'C'},
+    {n:'Zach Hyman',           t:'EDM', p:'LW'},
+    {n:'Mats Zuccarello',      t:'MIN', p:'RW'},
+    {n:'Cole Caufield',        t:'MTL', p:'RW'},
+    {n:'Lane Hutson',          t:'MTL', p:'D'},
+    {n:'Ivan Demidov',         t:'MTL', p:'RW'},
+    {n:'Nazem Kadri',          t:'COL', p:'C'},
+    {n:'Yanni Gourde',         t:'TBL', p:'C'},
+  ]},
+  Phil: { color:'#CE1126', players:[
+    {n:'Sebastian Aho',        t:'CAR', p:'C'},
+    {n:'Andrei Svechnikov',    t:'CAR', p:'RW'},
+    {n:'Jackson Blake',        t:'CAR', p:'RW'},
+    {n:'Shayne Gostisbehere',  t:'CAR', p:'D'},
+    {n:'Artturi Lehkonen',     t:'COL', p:'LW'},
+    {n:'Sam Malinski',         t:'COL', p:'D'},
+    {n:'Evan Bouchard',        t:'EDM', p:'D'},
+    {n:'Mattias Ekholm',       t:'EDM', p:'D'},
+    {n:'Nikita Kucherov',      t:'TBL', p:'RW'},
+    {n:'Jack Eichel',          t:'VGK', p:'C'},
+  ]},
+};
+
+// ================================================================
+// DAILY SNAPSHOTS — auto-updated each day by scheduled task
+// Each entry: cumulative playoff points AT END of that day.
+// The dashboard calculates day-over-day deltas automatically.
+// ================================================================
+const SNAPSHOTS = [
+  {
+    day: 0,
+    label: 'Pre-Playoffs',
+    date: 'Apr 19, 2026',
+    pts: {}
+  },
+  {
+    day: 1,
+    label: 'Day 1',
+    date: 'Apr 19, 2026',
+    pts: {
+      'Joel Eriksson Ek':    3,
+      'Matt Boldy':          3,
+      'Kirill Kaprizov':     3,
+      'Mats Zuccarello':     3,
+      'Ryan Hartman':        2,
+      'Quinn Hughes':        1,
+      'Brock Faber':         1,
+      'Taylor Hall':         2,
+      'Logan Stankoven':     2,
+      'Jackson Blake':       2,
+      'Evgeni Malkin':       2,
+      'Jason Robertson':     1,
+      'Miro Heiskanen':      1,
+      'Wyatt Johnston':      1,
+      'Nathan MacKinnon':    1,
+      'Artturi Lehkonen':    1,
+    }
+  },
+  // ↑ NEW ENTRIES ARE APPENDED HERE AUTOMATICALLY EACH DAY
+];
+
+// ================================================================
+// STATE
+// ================================================================
+let liveStats = {};
+let currentDay = 1;
+
+// ================================================================
+// NHL CDN logo helper
+// ================================================================
+function teamLogo(abbrev) {
+  return `https://assets.nhle.com/logos/nhl/svg/${abbrev}_light.svg`;
+}
+
+// ================================================================
+// NHL API
+// ================================================================
+async function fetchLiveStats() {
+  const statusEl = document.getElementById('status-msg');
+  const updEl    = document.getElementById('upd-time');
+  try {
+    const r = await fetch(
+      'https://api-web.nhle.com/v1/skater-stats-leaders/20252026/3?categories=points&limit=100',
+      { cache:'no-store' }
+    );
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    if (d.points && d.points.length > 0) {
+      d.points.forEach(pl => {
+        const full = `${pl.firstName.default} ${pl.lastName.default}`;
+        liveStats[full] = pl.value || 0;
+      });
+      const t = new Date();
+      updEl.textContent    = `Live · updated ${t.toLocaleTimeString()}`;
+      statusEl.textContent = `Live NHL data · ${d.points.length} playoff scorers loaded`;
+    } else {
+      throw new Error('empty');
+    }
+  } catch(e) {
+    updEl.textContent    = 'Showing snapshot data · open in a browser for live updates';
+    statusEl.textContent = 'NHL API blocked (local file) — showing last snapshot';
+  }
+  renderAll();
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+const MEDALS = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣'];
+
+function pts(name) {
+  if (liveStats[name] !== undefined) return liveStats[name];
+  const last = name.split(' ').slice(-1)[0].toLowerCase();
+  for (const [k,v] of Object.entries(liveStats)) {
+    if (typeof v === 'number' && k.toLowerCase().endsWith(last)) return v;
+  }
+  return 0;
+}
+
+function teamTotal(name) {
+  return POOL[name].players.reduce((s,p) => s + pts(p.n), 0);
+}
+
+function topScorer(name) {
+  let best = null, bestPts = -1;
+  POOL[name].players.forEach(p => { const v = pts(p.n); if(v > bestPts){ best=p; bestPts=v; } });
+  return { player: best, pts: bestPts };
+}
+
+function standings() {
+  return Object.keys(POOL)
+    .map(n => ({ name:n, total:teamTotal(n) }))
+    .sort((a,b) => b.total - a.total);
+}
+
+function dailyDelta(managerName, day) {
+  const cur  = SNAPSHOTS.find(s => s.day === day);
+  const prev = SNAPSHOTS.find(s => s.day === day - 1);
+  if (!cur || !prev) return null;
+  return POOL[managerName].players.reduce((s,p) => {
+    return s + ((cur.pts[p.n]||0) - (prev.pts[p.n]||0));
+  }, 0);
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderLeaderboard() {
+  const st = standings();
+  const rows = st.map((t,i) => {
+    const ts  = topScorer(t.name);
+    const wk  = dailyDelta(t.name, currentDay);
+    const wkHTML = wk === null ? '<span class="neu">—</span>'
+                 : wk > 0    ? `<span class="pos">+${wk}</span>`
+                 : wk < 0    ? `<span class="neg">${wk}</span>`
+                 :              '<span class="neu">0</span>';
+    const color = POOL[t.name].color;
+    return `
+      <tr class="data">
+        <td class="lb-rank">${MEDALS[i]}</td>
+        <td class="lb-name">
+          <span class="color-dot" style="background:${color}"></span>${t.name}
+        </td>
+        <td class="lb-pts">${t.total}</td>
+        <td class="lb-week">${wkHTML}</td>
+        <td style="font-size:.85rem;color:var(--muted)">
+          ${ts.pts > 0
+            ? `<img src="${teamLogo(ts.player.t)}" style="height:18px;vertical-align:middle;margin-right:5px">${ts.player.n} <strong style="color:var(--red)">(${ts.pts})</strong>`
+            : '—'}
+        </td>
+      </tr>`;
+  }).join('');
+  document.getElementById('lb-body').innerHTML = rows;
+}
+
+function renderTeamCards() {
+  const st = standings();
+  const rankOf = {};
+  st.forEach((t,i) => rankOf[t.name] = i + 1);
+
+  const html = Object.keys(POOL).map(name => {
+    const d  = POOL[name];
+    const tp = teamTotal(name);
+    const sorted = [...d.players]
+      .map(p => ({...p, pts: pts(p.n)}))
+      .sort((a,b) => b.pts - a.pts);
+
+    const rows = sorted.map(p => `
+      <div class="p-row">
+        <img class="p-logo" src="${teamLogo(p.t)}"
+          onerror="this.style.display='none'" alt="${p.t}">
+        <div class="p-info">
+          <div class="p-name">${p.n}</div>
+          <div class="p-team-pos">${p.t} · ${p.p}</div>
+        </div>
+        <div class="p-pts${p.pts >= 5 ? ' hot' : ''}">${p.pts}</div>
+      </div>`).join('');
+
+    return `
+      <div class="team-card">
+        <div class="tc-head" style="background:linear-gradient(135deg,${d.color}18,#fff)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:10px;height:36px;background:${d.color};border-radius:3px"></div>
+            <div>
+              <div class="tc-name" style="color:${d.color}">${name}</div>
+              <div class="tc-rank">Rank #${rankOf[name]}</div>
+            </div>
+          </div>
+          <div class="tc-right">
+            <div class="tc-pts">${tp}</div>
+            <div style="font-size:.7rem;color:var(--muted)">pts</div>
+          </div>
+        </div>
+        <div class="player-list">${rows}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('teams-grid').innerHTML = html;
+}
+
+function renderDaily() {
+  const maxD = Math.max(...SNAPSHOTS.map(s => s.day));
+  const day  = Math.max(1, Math.min(currentDay, maxD + 1));
+  const snap = SNAPSHOTS.find(s => s.day === day);
+  const label = snap ? snap.label : `Day ${day}`;
+  const date  = snap ? snap.date  : '';
+  document.getElementById('wk-label').textContent = `${label}${date ? '  ·  ' + date : ''}`;
+
+  const st     = standings();
+  const leader = st[0];
+  const second = st[1];
+  const last   = st[st.length - 1];
+
+  let html;
+  if (!snap || snap.day === 0) {
+    html = `
+      <strong>🏒 Puck drops soon — rosters are locked.</strong> Seven managers, 70 players, one champion.
+      Watch for <strong>Connor McDavid</strong> (Cole) and <strong>Leon Draisaitl</strong> (Dean) if Edmonton makes another deep run.
+      <strong>Phil</strong> went all-in on Carolina — four Hurricanes on one roster is either genius or a funeral waiting to happen.
+      <strong>Mike</strong> bet the house on Vegas with five Golden Knights. High risk, high reward.`;
+  } else {
+    const dayDeltas = Object.keys(POOL)
+      .map(n => ({ name:n, delta: dailyDelta(n, day) || 0 }))
+      .sort((a,b) => b.delta - a.delta);
+    const best   = dayDeltas[0];
+    const worst  = dayDeltas[dayDeltas.length - 1];
+    const gap    = leader.total - second.total;
+    const movers = dayDeltas.filter(d => d.delta > 0).map(d => `<strong>${d.name}</strong> (+${d.delta})`).join(', ') || 'nobody scored today';
+
+    html = `
+      <strong>📋 ${label} — ${date}</strong><br><br>
+      <strong>Today's scorers:</strong> ${movers}.<br>
+      <strong>${best.delta > 0 ? best.name : 'Nobody'}</strong> had the best day${best.delta > 0 ? ` with +${best.delta} pts` : ''}${worst.delta === 0 ? `. <strong>${worst.name}</strong> was shut out again` : ''}.
+      <br><br>
+      <strong>Overall:</strong> <strong>${leader.name}</strong> leads with <strong>${leader.total} pts</strong>,
+      ${gap > 0 ? `up ${gap} on <strong>${second.name}</strong>` : `tied with <strong>${second.name}</strong>`}.
+      <strong>${last.name}</strong> is at the bottom with ${last.total} pts${last.total < leader.total - 15 ? ' — the gap is getting ugly' : ''}.`;
+  }
+  document.getElementById('wk-body').innerHTML = html;
+}
+
+function renderTrashTalk() {
+  const st     = standings();
+  const leader = st[0];
+  const second = st[1];
+  const last   = st[st.length - 1];
+  const gap    = leader.total - second.total;
+  const lines  = [];
+
+  lines.push({
+    who: `👑 ${leader.name} — 1st Place (${leader.total} pts)`,
+    txt: leader.total > 0
+      ? `${leader.name} is out front with ${leader.total} points. It's Week 1 so this means almost nothing long-term — but it means everything for the next seven days of group chat gloating. Use it wisely.`
+      : `${leader.name} leads the pool with zero points because everyone has zero points. Dominant. Historic. Undefeated.`
+  });
+
+  lines.push({
+    who: `💀 ${last.name} — Last Place (${last.total} pts)`,
+    txt: last.total === 0
+      ? `${last.name} has ZERO points. The pool is live, pucks are dropping, and ${last.name}'s entire roster is producing the statistical output of an empty net. Five Golden Knights and not one of them has touched the scoresheet. This is a crisis.`
+      : `${last.total} points and last place. ${last.name}, you didn't build a playoff roster — you built a prayer circle.`
+  });
+
+  if (gap > 8) {
+    lines.push({
+      who: `📊 Gap Report: ${leader.name} +${gap} on the field`,
+      txt: `${gap} points already separating 1st from 2nd. It's Week 1 and one McDavid or Kucherov explosion flips the board overnight. But right now? ${second.name} is chasing.`
+    });
+  } else if (leader.total > 0) {
+    lines.push({
+      who: `🔪 ${leader.name} vs. ${second.name} — Only ${gap} Apart`,
+      txt: `${gap} points is nothing. One Draisaitl hat trick and the standings completely reshape. ${leader.name}: don't touch that trophy. ${second.name}: you're right there.`
+    });
+  }
+
+  lines.push({
+    who: `🦊 Jim's Minnesota Problem (A Good Problem)`,
+    txt: `Jim has FIVE Minnesota Wild — Boldy, Eriksson Ek, Faber, Quinn Hughes, AND Victor Hedman in reserve. The Wild are shredding early and Jim is the direct beneficiary. If Minnesota gets bounced in Round 1, Jim's whole pool collapses. Right now though? Genius draft.`
+  });
+
+  lines.push({
+    who: `🌀 Phil's Carolina Situation`,
+    txt: `Phil drafted FOUR Hurricanes and so far only Jackson Blake (2 pts) is delivering. Aho, Svechnikov, and Gostisbehere have been invisible. Phil is 5th. The Carolina stack was supposed to be the engine — right now it's idling in the parking lot.`
+  });
+
+  lines.push({
+    who: `🎰 Mike — Zero Points, Five Golden Knights`,
+    txt: `Mike has Marner, Stone, Barbashev, Hertl, AND Dorofaev on Vegas. Combined playoff points: zero. Zero. Mike bet the house on one franchise and the franchise has not shown up. This is either "it's early" or it's a catastrophe. Check back in 72 hours.`
+  });
+
+  lines.push({
+    who: `⏳ Dean's Geno Redemption Arc`,
+    txt: `People laughed at Dean for drafting Malkin at his age. Malkin has 2 points and is currently Dean's best player. Crosby is still at zero, but Geno is doing his thing. The retirement tour has points on the board. Respect.`
+  });
+
+  lines.push({
+    who: `⚡ Cole Riding the Wild Wave`,
+    txt: `Cole has Kaprizov (3 pts) and Hartman (2 pts) — both Minnesota Wild — plus Wyatt Johnston (1 pt). Cole is second place entirely because of the Minnesota explosion. McDavid is still at zero. If the Wild cool off and Edmonton doesn't wake up, Cole's lead evaporates fast.`
+  });
+
+  document.getElementById('trash-box').innerHTML = lines.map(l => `
+    <div class="tt-item">
+      <div class="tt-who">${l.who}</div>
+      <div class="tt-text">${l.txt}</div>
+    </div>`).join('');
+}
+
+function changeDay(d) {
+  const maxD = Math.max(...SNAPSHOTS.map(s => s.day), 1);
+  currentDay = Math.max(1, Math.min(currentDay + d, maxD + 1));
+  renderDaily();
+  renderLeaderboard();
+}
+
+function renderAll() {
+  renderLeaderboard();
+  renderTeamCards();
+  renderDaily();
+  renderTrashTalk();
+}
+
+// ================================================================
+// INIT
+// ================================================================
+function seedFromSnapshot() {
+  const latest = [...SNAPSHOTS].sort((a,b) => b.day - a.day)[0];
+  if (latest && latest.pts) {
+    Object.entries(latest.pts).forEach(([name, val]) => { liveStats[name] = val; });
+  }
+  // set currentDay to latest snapshot
+  currentDay = Math.max(...SNAPSHOTS.map(s => s.day));
+}
+
+seedFromSnapshot();
+renderAll();
+fetchLiveStats();
+setInterval(fetchLiveStats, 5 * 60 * 1000);
+</script>
+</body>
+</html>
