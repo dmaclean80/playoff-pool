@@ -428,6 +428,43 @@ const SNAPSHOTS = [
       'Artturi Lehkonen':    1,
     }
   },
+  {
+    day: 2,
+    label: 'Day 2',
+    date: 'Apr 19, 2026',
+    pts: {
+      'David Pastrnak':    3,
+      'Morgan Geekie':     3,
+      'Wyatt Johnston':    1,
+      'Kirill Kaprizov':   3,
+      'Ryan Hartman':      2,
+      'Darren Raddysh':    1,
+      'Tage Thompson':     3,
+      'Alex Tuch':         2,
+      'Nathan MacKinnon':  1,
+      'Brandon Hagel':     2,
+      'Jason Robertson':   1,
+      'Miro Heiskanen':    1,
+      'Evgeni Malkin':     2,
+      'Taylor Hall':       2,
+      'Logan Stankoven':   2,
+      'Matt Boldy':        3,
+      'Joel Eriksson Ek':  3,
+      'Brock Faber':       1,
+      'Jake Guentzel':     3,
+      'Quinn Hughes':      1,
+      'Jack Quinn':        1,
+      'Nick Suzuki':       2,
+      'Juraj Slafkovsky':  3,
+      'Mats Zuccarello':   3,
+      'Cole Caufield':     2,
+      'Lane Hutson':       1,
+      'Ivan Demidov':      1,
+      'Jackson Blake':     2,
+      'Artturi Lehkonen':  1,
+      'Nikita Kucherov':   2,
+    }
+  },
   // ↑ NEW ENTRIES ARE APPENDED HERE AUTOMATICALLY EACH DAY
 ];
 
@@ -643,54 +680,43 @@ function renderTrashTalk() {
   const lines  = [];
 
   lines.push({
-    who: `👑 ${leader.name} — 1st Place (${leader.total} pts)`,
-    txt: leader.total > 0
-      ? `${leader.name} is out front with ${leader.total} points. It's Week 1 so this means almost nothing long-term — but it means everything for the next seven days of group chat gloating. Use it wisely.`
-      : `${leader.name} leads the pool with zero points because everyone has zero points. Dominant. Historic. Undefeated.`
+    who: `👑 Jim — 1st Place (15 pts)`,
+    txt: `Jim is out front with 15 points, fuelled by four Minnesota Wild — Boldy (3), Eriksson Ek (3), Faber (1), Hughes (1) — plus Jake Guentzel going off for 3 in Tampa. Four players from one franchise is either visionary or a powder keg. Right now it's visionary. But if the Wild get bounced in Round 1, Jim's entire pool goes up in smoke.`
   });
 
   lines.push({
-    who: `💀 ${last.name} — Last Place (${last.total} pts)`,
-    txt: last.total === 0
-      ? `${last.name} has ZERO points. The pool is live, pucks are dropping, and ${last.name}'s entire roster is producing the statistical output of an empty net. Five Golden Knights and not one of them has touched the scoresheet. This is a crisis.`
-      : `${last.total} points and last place. ${last.name}, you didn't build a playoff roster — you built a prayer circle.`
-  });
-
-  if (gap > 8) {
-    lines.push({
-      who: `📊 Gap Report: ${leader.name} +${gap} on the field`,
-      txt: `${gap} points already separating 1st from 2nd. It's Week 1 and one McDavid or Kucherov explosion flips the board overnight. But right now? ${second.name} is chasing.`
-    });
-  } else if (leader.total > 0) {
-    lines.push({
-      who: `🔪 ${leader.name} vs. ${second.name} — Only ${gap} Apart`,
-      txt: `${gap} points is nothing. One Draisaitl hat trick and the standings completely reshape. ${leader.name}: don't touch that trophy. ${second.name}: you're right there.`
-    });
-  }
-
-  lines.push({
-    who: `🦊 Jim's Minnesota Problem (A Good Problem)`,
-    txt: `Jim has FIVE Minnesota Wild — Boldy, Eriksson Ek, Faber, Quinn Hughes, AND Victor Hedman in reserve. The Wild are shredding early and Jim is the direct beneficiary. If Minnesota gets bounced in Round 1, Jim's whole pool collapses. Right now though? Genius draft.`
+    who: `💀 Dean — Last Place (4 pts)`,
+    txt: `Dean is dead last with 4 points. Crosby has zero. Draisaitl hasn't even played yet. The two centrepiece picks of Dean's roster are a combined 0-for-so-far, and Evgeni Malkin — the guy everyone mocked — is literally Dean's leading scorer with 2 points. When Geno is your hero, you're in trouble.`
   });
 
   lines.push({
-    who: `🌀 Phil's Carolina Situation`,
-    txt: `Phil drafted FOUR Hurricanes and so far only Jackson Blake (2 pts) is delivering. Aho, Svechnikov, and Gostisbehere have been invisible. Phil is 5th. The Carolina stack was supposed to be the engine — right now it's idling in the parking lot.`
+    who: `🔪 Jim vs. Cole — Just 2 Points Separating 1st and 2nd`,
+    txt: `Jim leads Cole by only 2 points. Cole has THREE players at 3 pts each — Pastrnak, Kaprizov, and Geekie — so the production is spread out and real. Connor McDavid has not played yet, which means Cole has an undetonated bomb sitting on his roster. Jim's lead is fragile and everyone knows it.`
   });
 
   lines.push({
-    who: `🎰 Mike — Zero Points, Five Golden Knights`,
-    txt: `Mike has Marner, Stone, Barbashev, Hertl, AND Dorofaev on Vegas. Combined playoff points: zero. Zero. Mike bet the house on one franchise and the franchise has not shown up. This is either "it's early" or it's a catastrophe. Check back in 72 hours.`
+    who: `🎰 Mike's Five Dead Knights`,
+    txt: `Mike has Marner, Stone, Barbashev, Hertl, AND Dorofaev on Vegas. Combined playoff points: zero. To be fair, Vegas hasn't played yet. But when your entire franchise block is sitting at zero while everyone else is scoring, you feel it. The Golden Knights better show up when they finally hit the ice or Mike is done.`
   });
 
   lines.push({
-    who: `⏳ Dean's Geno Redemption Arc`,
-    txt: `People laughed at Dean for drafting Malkin at his age. Malkin has 2 points and is currently Dean's best player. Crosby is still at zero, but Geno is doing his thing. The retirement tour has points on the board. Respect.`
+    who: `🌀 Phil's Carolina Corpses`,
+    txt: `Phil drafted FOUR Carolina Hurricanes. Jackson Blake has 2 pts. Sebastian Aho, Andrei Svechnikov, and Shayne Gostisbehere are all sitting at zero. Phil is 6th with 5 points. Kucherov (2 pts) is quietly Phil's best player — and he's not even a Cane. The Carolina stack was the bet. It is not paying off.`
   });
 
   lines.push({
-    who: `⚡ Cole Riding the Wild Wave`,
-    txt: `Cole has Kaprizov (3 pts) and Hartman (2 pts) — both Minnesota Wild — plus Wyatt Johnston (1 pt). Cole is second place entirely because of the Minnesota explosion. McDavid is still at zero. If the Wild cool off and Edmonton doesn't wake up, Cole's lead evaporates fast.`
+    who: `🦁 Slafkovsky Is the Only Reason Mike Isn't in Last`,
+    txt: `Juraj Slafkovsky has 3 points and is single-handedly keeping Mike out of the basement. Strip him out and Mike has 3 points — tied with Dean for last. One 20-year-old from Montreal is propping up an entire roster built around Vegas. This is not a sustainable strategy.`
+  });
+
+  lines.push({
+    who: `⏳ Dean's Edmonton Problem`,
+    txt: `Leon Draisaitl, Dean's supposed ace, has not played. Neither has Matt Savoie. Edmonton hasn't taken the ice yet in these playoffs, which means Dean's ceiling hasn't been tested. If Draisaitl erupts out of the gate, Dean climbs fast. If Edmonton goes cold, Dean is cooked. The wait continues.`
+  });
+
+  lines.push({
+    who: `📊 The VGK Time Bomb`,
+    txt: `Vegas hasn't played yet and three managers are sweating it: Mike (Marner, Stone, Barbashev, Hertl, Dorofaev — five players), Phil (Eichel), and Neil (nobody, smart). If VGK catches fire, Mike rockets up the standings. If they're flat, Mike is done. No other manager has this much riding on a single series that hasn't even started.`
   });
 
   document.getElementById('trash-box').innerHTML = lines.map(l => `
