@@ -639,10 +639,14 @@ function renderDaily() {
   let html;
   if (!snap || snap.day === 0) {
     html = `
-      <strong>🏒 Puck drops soon — rosters are locked.</strong> Seven managers, 70 players, one champion.
-      Watch for <strong>Connor McDavid</strong> (Cole) and <strong>Leon Draisaitl</strong> (Dean) if Edmonton makes another deep run.
-      <strong>Phil</strong> went all-in on Carolina — four Hurricanes on one roster is either genius or a funeral waiting to happen.
-      <strong>Mike</strong> bet the house on Vegas with five Golden Knights. High risk, high reward.`;
+      <strong>🏒 Rosters are locked. Puck drops shortly.</strong> Seven managers, 70 players, one survivor.
+      <strong>Jim</strong> stacked four Minnesota Wild — Boldy, Eriksson Ek, Hughes, Faber — plus Jake Guentzel in Tampa. The highest single-franchise concentration in the pool. If Minnesota goes deep, Jim runs away. If they exit Round 1, Jim is suddenly average with no safety net.
+      <strong>Cole</strong> has the highest ceiling in the room. McDavid plus Pastrnak plus Kaprizov is a dangerous trio. When all three are clicking in the same series, nobody can match that production rate. The floor is real too — if Edmonton exits early, so does Cole's lead.
+      <strong>Dean</strong> went prestige shopping: Crosby, Draisaitl, Malkin. Three future Hall-of-Famers who all need deep runs to pay off. If Pittsburgh and Edmonton both go cold in Round 1, Dean's entire draft strategy evaporates in four games.
+      <strong>Mike</strong> locked in five Vegas Golden Knights — Marner, Stone, Barbashev, Hertl, Dorofaev. Half the roster from one franchise. If VGK runs hot, Mike looks like a genius. If they sputter, Mike has Slafkovsky, Suzuki, and a lot of explaining to do.
+      <strong>Phil</strong> went four Hurricanes deep: Aho, Svechnikov, Gostisbehere, Blake. Carolina is legitimate — the depth is real. Kucherov in Tampa is the insurance policy. This draft works if Carolina plays into June. It collapses if they get bounced early.
+      <strong>Neil</strong> built around Cale Makar and spread the rest across multiple franchises — Zuccarello, Caufield, Kadri, Hintz. The cleanest distribution in the pool. No catastrophic single-series elimination risk. The weakness is the ceiling: no one pick who can go 15 points in a run the way McDavid can.
+      <strong>Dave</strong> is the most underrated build in the pool — MacKinnon, Thompson, Hagel, Ehlers, with Colorado loaded for a deep run. Multiple legitimate threats across multiple franchises. No one is talking about Dave. That is exactly how Dave wants it heading into Game 1.`;
   } else {
     const dayDeltas = Object.keys(POOL)
       .map(n => ({ name:n, delta: dailyDelta(n, day) || 0 }))
@@ -673,43 +677,43 @@ function renderTrashTalk() {
   const lines  = [];
 
   lines.push({
-    who: `👑 Jim — 1st Place (15 pts)`,
-    txt: `Jim is out front with 15 points, fuelled by four Minnesota Wild — Boldy (3), Eriksson Ek (3), Faber (1), Hughes (1) — plus Jake Guentzel going off for 3 in Tampa. Four players from one franchise is either visionary or a powder keg. Right now it's visionary. But if the Wild get bounced in Round 1, Jim's entire pool goes up in smoke.`
+    who: '👑 Jim — 1st Place, 15 pts',
+    txt: 'Jim leads the pool with 15 points and the structure is dangerously concentrated: four Minnesota Wild (Boldy 3, Eriksson Ek 3, Hughes 1, Faber 1) plus Jake Guentzel erupting for 3 in Tampa. Four players from one franchise is not a strategy — it is a one-series wipeout event dressed up as a draft plan. Minnesota exits in Round 1 and Jim becomes instantly mediocre. It is working right now. Minnesota had better not get swept.'
   });
 
   lines.push({
-    who: `💀 Dean — Last Place (4 pts)`,
-    txt: `Dean is dead last with 4 points. Crosby has zero. Draisaitl hasn't even played yet. The two centrepiece picks of Dean's roster are a combined 0-for-so-far, and Evgeni Malkin — the guy everyone mocked — is literally Dean's leading scorer with 2 points. When Geno is your hero, you're in trouble.`
+    who: '💀 Dean — Last Place, 4 pts',
+    txt: 'Last place with 4 points, and the resume is embarrassing. Crosby: zero. Draisaitl: zero. The two anchors of Dean\'s entire draft strategy are invisible through two days of playoffs. The only reason Dean is not at zero is Evgeni Malkin (2 pts) — the pick Dean probably felt worst about making. Robertson and Heiskanen added 1 each. That is the whole roster. If Crosby and Draisaitl do not show up soon, Dean is watching from the couch by mid-May.'
   });
 
   lines.push({
-    who: `🔪 Jim vs. Cole — Just 2 Points Separating 1st and 2nd`,
-    txt: `Jim leads Cole by only 2 points. Cole has THREE players at 3 pts each — Pastrnak, Kaprizov, and Geekie — so the production is spread out and real. Connor McDavid has not played yet, which means Cole has an undetonated bomb sitting on his roster. Jim's lead is fragile and everyone knows it.`
+    who: '⚡ Jim Leads Cole by Exactly 2 Points. McDavid Has Zero.',
+    txt: 'Cole sits 2nd with 13 points — Pastrnak 3, Kaprizov 3, Geekie 3, Hartman 2, Johnston 1, Raddysh 1. That is six contributors, real distributed production. And Connor McDavid has not played yet. When Edmonton gets going, Cole does not close a 2-point gap — he blows past it in a single period. Jim\'s lead is a weather forecast, not a fact.'
   });
 
   lines.push({
-    who: `🎰 Mike's Five Dead Knights`,
-    txt: `Mike has Marner, Stone, Barbashev, Hertl, AND Dorofaev on Vegas. Combined playoff points: zero. To be fair, Vegas hasn't played yet. But when your entire franchise block is sitting at zero while everyone else is scoring, you feel it. The Golden Knights better show up when they finally hit the ice or Mike is done.`
+    who: '🎰 Mike Has Five Golden Knights and Zero Points From Any of Them',
+    txt: 'Marner, Stone, Barbashev, Hertl, Dorofaev — five Vegas Golden Knights on Mike\'s roster — have scored exactly zero playoff points combined. All 6 of Mike\'s points came from Slafkovsky (3), Suzuki (2), and Quinn (1): three Montreal and Buffalo players who were never supposed to be the point of this team. When VGK finally laces them up, Mike either launches or confirms the catastrophe. No middle ground exists.'
   });
 
   lines.push({
-    who: `🌀 Phil's Carolina Corpses`,
-    txt: `Phil drafted FOUR Carolina Hurricanes. Jackson Blake has 2 pts. Sebastian Aho, Andrei Svechnikov, and Shayne Gostisbehere are all sitting at zero. Phil is 6th with 5 points. Kucherov (2 pts) is quietly Phil's best player — and he's not even a Cane. The Carolina stack was the bet. It is not paying off.`
+    who: '🌀 Phil\'s Carolina Core Is a Ghost Story',
+    txt: 'Phil drafted four Hurricanes — Aho, Svechnikov, Gostisbehere, Blake — as his foundation. Jackson Blake has 2 points. The other three are at zero. Phil\'s best player right now is Nikita Kucherov with 2 points, a guy who has nothing to do with Carolina. The entire Carolina depth thesis has produced 2 points in 2 days. Phil is 6th with 5 total and the franchise he bet on most is invisible.'
   });
 
   lines.push({
-    who: `🦁 Slafkovsky Is the Only Reason Mike Isn't in Last`,
-    txt: `Juraj Slafkovsky has 3 points and is single-handedly keeping Mike out of the basement. Strip him out and Mike has 3 points — tied with Dean for last. One 20-year-old from Montreal is propping up an entire roster built around Vegas. This is not a sustainable strategy.`
+    who: '🧊 Six of Neil\'s Ten Players Have Not Scored a Single Point',
+    txt: 'Neil is 4th with 7 points, but Cale Makar — the best defenseman in the sport — has zero. Roope Hintz: zero. Zach Hyman: zero. Nazem Kadri: zero. Yanni Gourde: zero. Cutter Gauthier: zero. The entire roster is being carried by Zuccarello (3), Caufield (2), Hutson (1), and Demidov (1). That is four players doing all the work while six passengers collect dust. When Makar wakes up, Neil moves. He is not awake yet.'
   });
 
   lines.push({
-    who: `⏳ Dean's Edmonton Problem`,
-    txt: `Leon Draisaitl, Dean's supposed ace, has not played. Neither has Matt Savoie. Edmonton hasn't taken the ice yet in these playoffs, which means Dean's ceiling hasn't been tested. If Draisaitl erupts out of the gate, Dean climbs fast. If Edmonton goes cold, Dean is cooked. The wait continues.`
+    who: '🏗 Dave Is the Quietest Threat in the Pool',
+    txt: 'Dave sits 3rd with 8 points — Thompson 3, Hagel 2, Tuch 2, MacKinnon 1 — and nobody is paying attention. The scary part is the zeroes: Nichushkin, Cirelli, Duchene, Ehlers, Nelson are all sitting at nothing. Colorado has four players on Dave\'s roster and MacKinnon is at 1 point. When Colorado heats up in a deep run, that point total moves fast. Dave is not asking for attention. He is going to take it.'
   });
 
   lines.push({
-    who: `📊 The VGK Time Bomb`,
-    txt: `Vegas hasn't played yet and three managers are sweating it: Mike (Marner, Stone, Barbashev, Hertl, Dorofaev — five players), Phil (Eichel), and Neil (nobody, smart). If VGK catches fire, Mike rockets up the standings. If they're flat, Mike is done. No other manager has this much riding on a single series that hasn't even started.`
+    who: '🚮 The Dean-Phil Race to the Bottom Is Unexpectedly Competitive',
+    txt: 'Dean has 4 points. Phil has 5. Separated by one point, united in disappointment. Dean\'s two Hall-of-Famers are scoreless. Phil\'s four Hurricanes have combined for 2 points. These are the two managers who made the boldest concentration bets — Dean on Pittsburgh/Edmonton prestige, Phil on Carolina depth — and through two days of play, neither thesis has materialized. One of these two is winning this race to last place. The other is still losing.'
   });
 
   document.getElementById('trash-box').innerHTML = lines.map(l => `
