@@ -104,23 +104,6 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui
 .neu { color:var(--muted); }
 .color-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; flex-shrink:0; }
 
-/* ── WEEK NAV ── */
-.week-box {
-  background:var(--card); border:1px solid var(--border);
-  border-radius:14px; padding:24px; margin-bottom:32px;
-  box-shadow: 0 2px 12px rgba(0,38,84,.08);
-}
-.week-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-.week-nav button {
-  background:var(--navy); border:none; color:#fff;
-  padding:8px 18px; border-radius:8px; cursor:pointer; font-size:.85rem; font-weight:600;
-  transition:background .18s;
-}
-.week-nav button:hover { background:var(--red); }
-.week-label { font-size:1.1rem; font-weight:800; color:var(--navy); }
-.week-body { color:#374151; line-height:1.8; font-size:.95rem; }
-.week-body strong { color:var(--navy); }
-
 /* ── TEAM GRID ── */
 .teams-grid {
   display:grid;
@@ -159,9 +142,24 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui
 .p-pts.hot { color:var(--red); }
 
 /* ── SCORES ── */
+.scores-tabs {
+  display: flex; gap: 0; margin-bottom: 0;
+  border-bottom: 2px solid var(--border);
+}
+.scores-tab {
+  padding: 9px 20px; font-size: .82rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  cursor: pointer; border: none; background: none;
+  color: var(--muted); border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: color .15s, border-color .15s;
+}
+.scores-tab:hover { color: var(--navy); }
+.scores-tab.active { color: var(--navy); border-bottom-color: var(--red); }
+.scores-panel { display: none; padding-top: 18px; }
+.scores-panel.active { display: block; }
+.scores-wrap { margin-bottom: 32px; }
 .scores-grid {
   display: flex; flex-wrap: wrap; gap: 14px;
-  margin-bottom: 32px;
 }
 .score-card {
   background: var(--card); border: 1px solid var(--border);
@@ -195,22 +193,6 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui
   padding: 0 14px 10px; line-height: 1.5;
 }
 .sc-series strong { color: var(--navy); }
-
-/* ── TRASH TALK ── */
-.trash-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--red);
-  border-radius:14px; padding:24px; margin-bottom:32px;
-  box-shadow: 0 2px 12px rgba(0,38,84,.08);
-}
-.tt-item {
-  background:var(--stripe); border-left:4px solid var(--red);
-  padding:12px 16px; margin-bottom:12px; border-radius:0 10px 10px 0;
-}
-.tt-item:last-child { margin-bottom:0; }
-.tt-who { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--red); margin-bottom:5px; }
-.tt-text { font-size:.925rem; line-height:1.65; color:#374151; }
 
 /* ── STATUS BAR ── */
 .status-bar {
@@ -264,25 +246,23 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui
   </div>
 
   <!-- LIVE SCORES -->
-  <div class="section-head">🚨 Today's Games</div>
-  <div class="scores-grid" id="scores-grid">
-    <div style="color:var(--muted);font-size:.9rem">Loading scores…</div>
-  </div>
-
-  <!-- DAILY SUMMARY -->
-  <div class="section-head">📅 Daily Summary</div>
-  <div class="week-box">
-    <div class="week-nav">
-      <button onclick="changeDay(-1)">◀ Prev</button>
-      <span class="week-label" id="wk-label">Day 1</span>
-      <button onclick="changeDay(1)">Next ▶</button>
+  <div class="section-head">🚨 Games</div>
+  <div class="scores-wrap">
+    <div class="scores-tabs">
+      <button class="scores-tab" id="tab-yesterday" onclick="switchScoresTab('yesterday')">Yesterday</button>
+      <button class="scores-tab active" id="tab-today" onclick="switchScoresTab('today')">Today</button>
+      <button class="scores-tab" id="tab-tomorrow" onclick="switchScoresTab('tomorrow')">Tomorrow</button>
     </div>
-    <div class="week-body" id="wk-body">Loading…</div>
+    <div class="scores-panel" id="panel-yesterday" style="display:none">
+      <div class="scores-grid" id="scores-yesterday"><div style="color:var(--muted);font-size:.9rem">Loading…</div></div>
+    </div>
+    <div class="scores-panel" id="panel-today" style="display:block">
+      <div class="scores-grid" id="scores-today"><div style="color:var(--muted);font-size:.9rem">Loading scores…</div></div>
+    </div>
+    <div class="scores-panel" id="panel-tomorrow" style="display:none">
+      <div class="scores-grid" id="scores-tomorrow"><div style="color:var(--muted);font-size:.9rem">Loading…</div></div>
+    </div>
   </div>
-
-  <!-- TRASH TALK -->
-  <div class="section-head" style="color:var(--red)">🔥 Trash Talk Corner</div>
-  <div class="trash-box" id="trash-box"></div>
 
   <!-- TEAM CARDS -->
   <div class="section-head">👥 Team Rosters</div>
@@ -458,6 +438,670 @@ const SNAPSHOTS = [
       'Nikita Kucherov':   2,
     }
   },
+  {
+    day: 3,
+    label: 'Day 3',
+    date: 'Apr 25, 2026',
+    pts: {
+      'David Pastrnak': 5,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 3,
+      'Connor McDavid': 0,
+      'Kirill Kaprizov': 4,
+      'Ryan Hartman': 2,
+      'Darren Raddysh': 0,
+      'Gabriel Landeskog': 2,
+      'James Hagens': 0,
+      'Tage Thompson': 3,
+      'Alex Tuch': 4,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 0,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 5,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 5,
+      'Anthony Cirelli': 2,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 5,
+      'Miro Heiskanen': 3,
+      'Leon Draisaitl': 4,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 0,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 5,
+      'Logan Stankoven': 4,
+      'Quinton Byfield': 2,
+      'Matt Boldy': 4,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 3,
+      'Jake Guentzel': 5,
+      'Brayden Point': 0,
+      'Quinn Hughes': 4,
+      'Victor Hedman': 0,
+      'Jack Quinn': 2,
+      'Ryan Nugent-Hopkins': 0,
+      'Nick Suzuki': 3,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 0,
+      'Mitch Marner': 2,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 3,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 3,
+      'Cale Makar': 0,
+      'Roope Hintz': 0,
+      'Zach Hyman': 1,
+      'Mats Zuccarello': 3,
+      'Cole Caufield': 3,
+      'Lane Hutson': 3,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 0,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 3,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 0,
+      'Mattias Ekholm': 2,
+      'Nikita Kucherov': 4,
+      'Jack Eichel': 3,
+    }
+  },
+  {
+    day: 4,
+    label: 'Day 4',
+    date: 'Apr 25, 2026',
+    pts: {
+      'David Pastrnak': 5,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 3,
+      'Connor McDavid': 2,
+      'Kirill Kaprizov': 4,
+      'Ryan Hartman': 2,
+      'Gabriel Landeskog': 2,
+      'Tage Thompson': 3,
+      'Alex Tuch': 4,
+      'Matt Duchene': 5,
+      'Brandon Hagel': 5,
+      'Anthony Cirelli': 2,
+      'Jason Robertson': 5,
+      'Miro Heiskanen': 3,
+      'Leon Draisaitl': 6,
+      'Evgeni Malkin': 3,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 2,
+      'Matt Boldy': 4,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 3,
+      'Jake Guentzel': 5,
+      'Quinn Hughes': 4,
+      'Jack Quinn': 2,
+      'Nick Suzuki': 3,
+      'Juraj Slafkovsky': 3,
+      'Mitch Marner': 2,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 3,
+      'Cutter Gauthier': 3,
+      'Mats Zuccarello': 3,
+      'Cole Caufield': 3,
+      'Lane Hutson': 3,
+      'Sebastian Aho': 3,
+      'Jackson Blake': 4,
+      'Artturi Lehkonen': 3,
+      'Nikita Kucherov': 4,
+      'Jack Eichel': 3,
+      'Ryan Nugent-Hopkins': 2,
+    }
+  },
+  {
+    day: 5,
+    label: 'Day 5',
+    date: 'Apr 26, 2026',
+    pts: {
+      'David Pastrnak': 5,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 5,
+      'Connor McDavid': 2,
+      'Kirill Kaprizov': 6,
+      'Ryan Hartman': 3,
+      'Darren Raddysh': 0,
+      'Gabriel Landeskog': 2,
+      'James Hagens': 0,
+      'Tage Thompson': 3,
+      'Alex Tuch': 4,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 0,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 7,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 5,
+      'Anthony Cirelli': 2,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 6,
+      'Miro Heiskanen': 4,
+      'Leon Draisaitl': 6,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 3,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 2,
+      'Matt Boldy': 5,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 5,
+      'Jake Guentzel': 5,
+      'Brayden Point': 0,
+      'Quinn Hughes': 4,
+      'Victor Hedman': 0,
+      'Jack Quinn': 2,
+      'Ryan Nugent-Hopkins': 2,
+      'Nick Suzuki': 3,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 0,
+      'Mitch Marner': 2,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 3,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 3,
+      'Cale Makar': 0,
+      'Roope Hintz': 0,
+      'Zach Hyman': 0,
+      'Mats Zuccarello': 3,
+      'Cole Caufield': 3,
+      'Lane Hutson': 3,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 3,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 0,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 4,
+      'Jack Eichel': 3,
+    }
+  },
+  {
+    day: 6,
+    label: 'Day 6',
+    date: 'Apr 27, 2026',
+    pts: {
+      'David Pastrnak': 5,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 5,
+      'Connor McDavid': 4,
+      'Kirill Kaprizov': 6,
+      'Ryan Hartman': 3,
+      'Darren Raddysh': 2,
+      'Gabriel Landeskog': 4,
+      'James Hagens': 0,
+      'Tage Thompson': 4,
+      'Alex Tuch': 6,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 4,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 7,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 7,
+      'Anthony Cirelli': 0,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 6,
+      'Miro Heiskanen': 4,
+      'Leon Draisaitl': 7,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 3,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 0,
+      'Matt Boldy': 5,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 5,
+      'Jake Guentzel': 7,
+      'Brayden Point': 0,
+      'Quinn Hughes': 4,
+      'Victor Hedman': 0,
+      'Jack Quinn': 3,
+      'Ryan Nugent-Hopkins': 3,
+      'Nick Suzuki': 4,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 0,
+      'Mitch Marner': 0,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 3,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 4,
+      'Cale Makar': 2,
+      'Roope Hintz': 0,
+      'Zach Hyman': 0,
+      'Mats Zuccarello': 3,
+      'Cole Caufield': 4,
+      'Lane Hutson': 4,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 4,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 4,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 6,
+      'Jack Eichel': 3,
+    }
+  },
+  {
+    day: 7,
+    label: 'Day 7',
+    date: 'Apr 28, 2026',
+    pts: {
+      'David Pastrnak': 5,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 5,
+      'Connor McDavid': 4,
+      'Kirill Kaprizov': 6,
+      'Ryan Hartman': 3,
+      'Darren Raddysh': 2,
+      'Gabriel Landeskog': 4,
+      'James Hagens': 0,
+      'Tage Thompson': 4,
+      'Alex Tuch': 6,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 4,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 7,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 7,
+      'Anthony Cirelli': 0,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 6,
+      'Miro Heiskanen': 4,
+      'Leon Draisaitl': 7,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 5,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 0,
+      'Matt Boldy': 5,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 5,
+      'Jake Guentzel': 7,
+      'Brayden Point': 0,
+      'Quinn Hughes': 4,
+      'Victor Hedman': 0,
+      'Jack Quinn': 3,
+      'Ryan Nugent-Hopkins': 3,
+      'Nick Suzuki': 4,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 0,
+      'Mitch Marner': 3,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 4,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 4,
+      'Cale Makar': 2,
+      'Roope Hintz': 0,
+      'Zach Hyman': 0,
+      'Mats Zuccarello': 3,
+      'Cole Caufield': 4,
+      'Lane Hutson': 4,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 4,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 4,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 6,
+      'Jack Eichel': 6,
+    }
+  },
+  {
+    day: 8,
+    label: 'Day 8',
+    date: 'Apr 29, 2026',
+    pts: {
+      'David Pastrnak': 6,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 6,
+      'Connor McDavid': 4,
+      'Kirill Kaprizov': 9,
+      'Ryan Hartman': 4,
+      'Darren Raddysh': 0,
+      'Gabriel Landeskog': 4,
+      'James Hagens': 0,
+      'Tage Thompson': 5,
+      'Alex Tuch': 6,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 4,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 8,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 7,
+      'Anthony Cirelli': 0,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 8,
+      'Miro Heiskanen': 6,
+      'Leon Draisaitl': 7,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 5,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 0,
+      'Matt Boldy': 7,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 5,
+      'Jake Guentzel': 7,
+      'Brayden Point': 0,
+      'Quinn Hughes': 5,
+      'Victor Hedman': 0,
+      'Jack Quinn': 3,
+      'Ryan Nugent-Hopkins': 3,
+      'Nick Suzuki': 4,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 0,
+      'Mitch Marner': 3,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 4,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 4,
+      'Cale Makar': 2,
+      'Roope Hintz': 0,
+      'Zach Hyman': 0,
+      'Mats Zuccarello': 4,
+      'Cole Caufield': 4,
+      'Lane Hutson': 4,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 4,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 4,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 6,
+      'Jack Eichel': 6,
+    }
+  },
+  {
+    day: 9,
+    label: 'Day 9',
+    date: 'Apr 30, 2026',
+    pts: {
+      'David Pastrnak': 6,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 5,
+      'Mikko Rantanen': 6,
+      'Connor McDavid': 6,
+      'Kirill Kaprizov': 9,
+      'Ryan Hartman': 4,
+      'Darren Raddysh': 0,
+      'Gabriel Landeskog': 4,
+      'James Hagens': 0,
+      'Tage Thompson': 5,
+      'Alex Tuch': 6,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 4,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 8,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 7,
+      'Anthony Cirelli': 0,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 8,
+      'Miro Heiskanen': 6,
+      'Leon Draisaitl': 9,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 5,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 0,
+      'Matt Boldy': 7,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 5,
+      'Jake Guentzel': 8,
+      'Brayden Point': 0,
+      'Quinn Hughes': 5,
+      'Victor Hedman': 0,
+      'Jack Quinn': 3,
+      'Ryan Nugent-Hopkins': 5,
+      'Nick Suzuki': 5,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 0,
+      'Mitch Marner': 3,
+      'Mark Stone': 3,
+      'Ivan Barbashev': 4,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 5,
+      'Cale Makar': 2,
+      'Roope Hintz': 0,
+      'Zach Hyman': 2,
+      'Mats Zuccarello': 4,
+      'Cole Caufield': 4,
+      'Lane Hutson': 5,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 4,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 7,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 6,
+      'Jack Eichel': 6,
+    }
+  },
+  {
+    day: 10,
+    label: 'Day 10',
+    date: 'May 01, 2026',
+    pts: {
+      'David Pastrnak': 6,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 6,
+      'Mikko Rantanen': 7,
+      'Connor McDavid': 6,
+      'Kirill Kaprizov': 9,
+      'Ryan Hartman': 4,
+      'Darren Raddysh': 0,
+      'Gabriel Landeskog': 4,
+      'James Hagens': 0,
+      'Tage Thompson': 5,
+      'Alex Tuch': 6,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 4,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 9,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 7,
+      'Anthony Cirelli': 0,
+      'Rasmus Dahlin': 0,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 8,
+      'Miro Heiskanen': 6,
+      'Leon Draisaitl': 10,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 5,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 0,
+      'Matt Boldy': 9,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 6,
+      'Jake Guentzel': 8,
+      'Brayden Point': 0,
+      'Quinn Hughes': 8,
+      'Victor Hedman': 0,
+      'Jack Quinn': 3,
+      'Ryan Nugent-Hopkins': 5,
+      'Nick Suzuki': 5,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 4,
+      'Mitch Marner': 4,
+      'Mark Stone': 4,
+      'Ivan Barbashev': 5,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 7,
+      'Cale Makar': 2,
+      'Roope Hintz': 0,
+      'Zach Hyman': 0,
+      'Mats Zuccarello': 5,
+      'Cole Caufield': 4,
+      'Lane Hutson': 5,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 4,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 7,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 6,
+      'Jack Eichel': 8,
+    }
+  },
+  {
+    day: 11,
+    label: 'Day 11',
+    date: 'May 02, 2026',
+    pts: {
+      'David Pastrnak': 7,
+      'Morgan Geekie': 4,
+      'Wyatt Johnston': 6,
+      'Mikko Rantanen': 7,
+      'Connor McDavid': 6,
+      'Kirill Kaprizov': 9,
+      'Ryan Hartman': 4,
+      'Darren Raddysh': 0,
+      'Gabriel Landeskog': 4,
+      'James Hagens': 0,
+      'Tage Thompson': 7,
+      'Alex Tuch': 7,
+      'Nikolaj Ehlers': 0,
+      'Nathan MacKinnon': 4,
+      'Brock Nelson': 0,
+      'Valeri Nichushkin': 0,
+      'Matt Duchene': 9,
+      'Marcus Johansson': 0,
+      'Brandon Hagel': 8,
+      'Anthony Cirelli': 0,
+      'Rasmus Dahlin': 4,
+      'Seth Jarvis': 0,
+      'Martin Necas': 0,
+      'Jason Robertson': 8,
+      'Miro Heiskanen': 6,
+      'Leon Draisaitl': 10,
+      'Tim Stutzle': 0,
+      'Sidney Crosby': 5,
+      'Evgeni Malkin': 3,
+      'Matt Savoie': 0,
+      'Taylor Hall': 7,
+      'Logan Stankoven': 5,
+      'Quinton Byfield': 0,
+      'Matt Boldy': 9,
+      'Joel Eriksson Ek': 5,
+      'Brock Faber': 6,
+      'Jake Guentzel': 8,
+      'Brayden Point': 0,
+      'Quinn Hughes': 8,
+      'Victor Hedman': 0,
+      'Jack Quinn': 3,
+      'Ryan Nugent-Hopkins': 5,
+      'Nick Suzuki': 5,
+      'Juraj Slafkovsky': 3,
+      'Anthony Mantha': 0,
+      'Pavel Dorofaev': 4,
+      'Mitch Marner': 7,
+      'Mark Stone': 5,
+      'Ivan Barbashev': 6,
+      'Tomas Hertl': 0,
+      'Cutter Gauthier': 7,
+      'Cale Makar': 2,
+      'Roope Hintz': 0,
+      'Zach Hyman': 0,
+      'Mats Zuccarello': 5,
+      'Cole Caufield': 4,
+      'Lane Hutson': 5,
+      'Ivan Demidov': 0,
+      'Nazem Kadri': 0,
+      'Yanni Gourde': 0,
+      'Sebastian Aho': 3,
+      'Andrei Svechnikov': 0,
+      'Jackson Blake': 4,
+      'Shayne Gostisbehere': 0,
+      'Artturi Lehkonen': 4,
+      'Sam Malinski': 0,
+      'Evan Bouchard': 7,
+      'Mattias Ekholm': 0,
+      'Nikita Kucherov': 6,
+      'Jack Eichel': 9,
+    }
+  },
   // ↑ NEW ENTRIES ARE APPENDED HERE AUTOMATICALLY EACH DAY
 ];
 
@@ -564,7 +1208,7 @@ function renderLeaderboard() {
       <tr class="data">
         <td class="lb-rank">${MEDALS[i]}</td>
         <td class="lb-name">
-          <span class="color-dot" style="background:${color}"></span>${t.name}
+          <span class="color-dot" style="background:${color}"></span><a href="#team-${t.name}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--muted)" onmouseover="this.style.borderBottomColor=color" onmouseout="this.style.borderBottomColor='var(--muted)'">${t.name}</a>
         </td>
         <td class="lb-pts">${t.total}</td>
         <td class="lb-week">${wkHTML}</td>
@@ -602,7 +1246,7 @@ function renderTeamCards() {
       </div>`).join('');
 
     return `
-      <div class="team-card">
+      <div class="team-card" id="team-${name}">
         <div class="tc-head" style="background:linear-gradient(135deg,${d.color}18,#fff)">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="width:10px;height:36px;background:${d.color};border-radius:3px"></div>
@@ -623,206 +1267,111 @@ function renderTeamCards() {
   document.getElementById('teams-grid').innerHTML = html;
 }
 
-function renderDaily() {
-  const maxD = Math.max(...SNAPSHOTS.map(s => s.day));
-  const day  = Math.max(1, Math.min(currentDay, maxD + 1));
-  const snap = SNAPSHOTS.find(s => s.day === day);
-  const label = snap ? snap.label : `Day ${day}`;
-  const date  = snap ? snap.date  : '';
-  document.getElementById('wk-label').textContent = `${label}${date ? '  ·  ' + date : ''}`;
-
-  const st     = standings();
-  const leader = st[0];
-  const second = st[1];
-  const last   = st[st.length - 1];
-
-  let html;
-  if (!snap || snap.day === 0) {
-    html = `
-      <strong>🏒 Rosters are locked. Puck drops shortly.</strong> Seven managers, 70 players, one survivor.
-      <strong>Jim</strong> stacked four Minnesota Wild — Boldy, Eriksson Ek, Hughes, Faber — plus Jake Guentzel in Tampa. The highest single-franchise concentration in the pool. If Minnesota goes deep, Jim runs away. If they exit Round 1, Jim is suddenly average with no safety net.
-      <strong>Cole</strong> has the highest ceiling in the room. McDavid plus Pastrnak plus Kaprizov is a dangerous trio. When all three are clicking in the same series, nobody can match that production rate. The floor is real too — if Edmonton exits early, so does Cole's lead.
-      <strong>Dean</strong> went prestige shopping: Crosby, Draisaitl, Malkin. Three future Hall-of-Famers who all need deep runs to pay off. If Pittsburgh and Edmonton both go cold in Round 1, Dean's entire draft strategy evaporates in four games.
-      <strong>Mike</strong> locked in five Vegas Golden Knights — Marner, Stone, Barbashev, Hertl, Dorofaev. Half the roster from one franchise. If VGK runs hot, Mike looks like a genius. If they sputter, Mike has Slafkovsky, Suzuki, and a lot of explaining to do.
-      <strong>Phil</strong> went four Hurricanes deep: Aho, Svechnikov, Gostisbehere, Blake. Carolina is legitimate — the depth is real. Kucherov in Tampa is the insurance policy. This draft works if Carolina plays into June. It collapses if they get bounced early.
-      <strong>Neil</strong> built around Cale Makar and spread the rest across multiple franchises — Zuccarello, Caufield, Kadri, Hintz. The cleanest distribution in the pool. No catastrophic single-series elimination risk. The weakness is the ceiling: no one pick who can go 15 points in a run the way McDavid can.
-      <strong>Dave</strong> is the most underrated build in the pool — MacKinnon, Thompson, Hagel, Ehlers, with Colorado loaded for a deep run. Multiple legitimate threats across multiple franchises. No one is talking about Dave. That is exactly how Dave wants it heading into Game 1.`;
-  } else {
-    const dayDeltas = Object.keys(POOL)
-      .map(n => ({ name:n, delta: dailyDelta(n, day) || 0 }))
-      .sort((a,b) => b.delta - a.delta);
-    const best   = dayDeltas[0];
-    const worst  = dayDeltas[dayDeltas.length - 1];
-    const gap    = leader.total - second.total;
-    const movers = dayDeltas.filter(d => d.delta > 0).map(d => `<strong>${d.name}</strong> (+${d.delta})`).join(', ') || 'nobody scored today';
-
-    html = `
-      <strong>📋 ${label} — ${date}</strong><br><br>
-      <strong>Today's scorers:</strong> ${movers}.<br>
-      <strong>${best.delta > 0 ? best.name : 'Nobody'}</strong> had the best day${best.delta > 0 ? ` with +${best.delta} pts` : ''}${worst.delta === 0 ? `. <strong>${worst.name}</strong> was shut out again` : ''}.
-      <br><br>
-      <strong>Overall:</strong> <strong>${leader.name}</strong> leads with <strong>${leader.total} pts</strong>,
-      ${gap > 0 ? `up ${gap} on <strong>${second.name}</strong>` : `tied with <strong>${second.name}</strong>`}.
-      <strong>${last.name}</strong> is at the bottom with ${last.total} pts${last.total < leader.total - 15 ? ' — the gap is getting ugly' : ''}.`;
-  }
-  document.getElementById('wk-body').innerHTML = html;
-}
-
-function renderTrashTalk() {
-  const st     = standings();
-  const leader = st[0];
-  const second = st[1];
-  const last   = st[st.length - 1];
-  const gap    = leader.total - second.total;
-  const lines  = [];
-
-  lines.push({
-    who: '👑 Jim — 1st Place, 15 pts',
-    txt: 'Jim leads the pool with 15 points and the structure is dangerously concentrated: four Minnesota Wild (Boldy 3, Eriksson Ek 3, Hughes 1, Faber 1) plus Jake Guentzel erupting for 3 in Tampa. Four players from one franchise is not a strategy — it is a one-series wipeout event dressed up as a draft plan. Minnesota exits in Round 1 and Jim becomes instantly mediocre. It is working right now. Minnesota had better not get swept.'
-  });
-
-  lines.push({
-    who: '💀 Dean — Last Place, 4 pts',
-    txt: 'Last place with 4 points, and the resume is embarrassing. Crosby: zero. Draisaitl: zero. The two anchors of Dean\'s entire draft strategy are invisible through two days of playoffs. The only reason Dean is not at zero is Evgeni Malkin (2 pts) — the pick Dean probably felt worst about making. Robertson and Heiskanen added 1 each. That is the whole roster. If Crosby and Draisaitl do not show up soon, Dean is watching from the couch by mid-May.'
-  });
-
-  lines.push({
-    who: '⚡ Jim Leads Cole by Exactly 2 Points. McDavid Has Zero.',
-    txt: 'Cole sits 2nd with 13 points — Pastrnak 3, Kaprizov 3, Geekie 3, Hartman 2, Johnston 1, Raddysh 1. That is six contributors, real distributed production. And Connor McDavid has not played yet. When Edmonton gets going, Cole does not close a 2-point gap — he blows past it in a single period. Jim\'s lead is a weather forecast, not a fact.'
-  });
-
-  lines.push({
-    who: '🎰 Mike Has Five Golden Knights and Zero Points From Any of Them',
-    txt: 'Marner, Stone, Barbashev, Hertl, Dorofaev — five Vegas Golden Knights on Mike\'s roster — have scored exactly zero playoff points combined. All 6 of Mike\'s points came from Slafkovsky (3), Suzuki (2), and Quinn (1): three Montreal and Buffalo players who were never supposed to be the point of this team. When VGK finally laces them up, Mike either launches or confirms the catastrophe. No middle ground exists.'
-  });
-
-  lines.push({
-    who: '🌀 Phil\'s Carolina Core Is a Ghost Story',
-    txt: 'Phil drafted four Hurricanes — Aho, Svechnikov, Gostisbehere, Blake — as his foundation. Jackson Blake has 2 points. The other three are at zero. Phil\'s best player right now is Nikita Kucherov with 2 points, a guy who has nothing to do with Carolina. The entire Carolina depth thesis has produced 2 points in 2 days. Phil is 6th with 5 total and the franchise he bet on most is invisible.'
-  });
-
-  lines.push({
-    who: '🧊 Six of Neil\'s Ten Players Have Not Scored a Single Point',
-    txt: 'Neil is 4th with 7 points, but Cale Makar — the best defenseman in the sport — has zero. Roope Hintz: zero. Zach Hyman: zero. Nazem Kadri: zero. Yanni Gourde: zero. Cutter Gauthier: zero. The entire roster is being carried by Zuccarello (3), Caufield (2), Hutson (1), and Demidov (1). That is four players doing all the work while six passengers collect dust. When Makar wakes up, Neil moves. He is not awake yet.'
-  });
-
-  lines.push({
-    who: '🏗 Dave Is the Quietest Threat in the Pool',
-    txt: 'Dave sits 3rd with 8 points — Thompson 3, Hagel 2, Tuch 2, MacKinnon 1 — and nobody is paying attention. The scary part is the zeroes: Nichushkin, Cirelli, Duchene, Ehlers, Nelson are all sitting at nothing. Colorado has four players on Dave\'s roster and MacKinnon is at 1 point. When Colorado heats up in a deep run, that point total moves fast. Dave is not asking for attention. He is going to take it.'
-  });
-
-  lines.push({
-    who: '🚮 The Dean-Phil Race to the Bottom Is Unexpectedly Competitive',
-    txt: 'Dean has 4 points. Phil has 5. Separated by one point, united in disappointment. Dean\'s two Hall-of-Famers are scoreless. Phil\'s four Hurricanes have combined for 2 points. These are the two managers who made the boldest concentration bets — Dean on Pittsburgh/Edmonton prestige, Phil on Carolina depth — and through two days of play, neither thesis has materialized. One of these two is winning this race to last place. The other is still losing.'
-  });
-
-  document.getElementById('trash-box').innerHTML = lines.map(l => `
-    <div class="tt-item">
-      <div class="tt-who">${l.who}</div>
-      <div class="tt-text">${l.txt}</div>
-    </div>`).join('');
-}
-
-function changeDay(d) {
-  const maxD = Math.max(...SNAPSHOTS.map(s => s.day), 1);
-  currentDay = Math.max(1, Math.min(currentDay + d, maxD + 1));
-  renderDaily();
-  renderLeaderboard();
-}
-
 function renderAll() {
   renderLeaderboard();
   renderTeamCards();
-  renderDaily();
-  renderTrashTalk();
 }
 
 // ================================================================
-// LIVE SCORES
+// LIVE SCORES — tabbed: yesterday / today / tomorrow
 // ================================================================
-async function fetchScores() {
-  const el = document.getElementById('scores-grid');
+let activeScoresTab = 'today';
+
+function switchScoresTab(tab) {
+  activeScoresTab = tab;
+  ['yesterday','today','tomorrow'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`panel-${t}`).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function getDateStr(offset) {
+  // offset: -1 = yesterday, 0 = today, +1 = tomorrow (ET)
+  const now = new Date();
+  now.setDate(now.getDate() + offset);
+  return now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+}
+
+function buildScoreCards(games) {
+  if (!games || games.length === 0) {
+    return `<div style="color:var(--muted);font-size:.9rem;padding:8px">No games scheduled.</div>`;
+  }
+  return games.map(g => {
+    const awayWin = g.awayTeam.score > g.homeTeam.score;
+    const homeWin = g.homeTeam.score > g.awayTeam.score;
+    const isLive  = g.gameState === 'LIVE' || g.gameState === 'CRIT';
+    const isFinal = g.gameState === 'OFF'  || g.gameState === 'FINAL';
+
+    let statusText = '';
+    let statusClass = 'pre';
+    if (isFinal) {
+      const ot = g.gameOutcome?.lastPeriodType;
+      statusText  = 'Final' + (ot === 'OT' ? '/OT' : ot === 'SO' ? '/SO' : '');
+      statusClass = 'final';
+    } else if (isLive) {
+      const pd = g.periodDescriptor;
+      const perLabel = pd?.periodType === 'OT' ? 'OT'
+                     : pd?.periodType === 'SO' ? 'SO'
+                     : `P${pd?.number || g.period}`;
+      statusText  = `🔴 LIVE · ${perLabel} ${g.clock?.timeRemaining || ''}`;
+      statusClass = 'live';
+    } else {
+      const start = new Date(g.startTimeUTC);
+      statusText  = start.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
+      statusClass = 'pre';
+    }
+
+    const s = g.seriesStatus;
+    let seriesHTML = '';
+    if (s) {
+      const topW = s.topSeedWins, botW = s.bottomSeedWins;
+      const leader = topW > botW ? s.topSeedTeamAbbrev : botW > topW ? s.bottomSeedTeamAbbrev : null;
+      seriesHTML = leader
+        ? `<strong>${leader}</strong> leads series ${Math.max(topW,botW)}-${Math.min(topW,botW)}`
+        : `Series tied ${topW}-${botW}`;
+    }
+
+    return `
+      <div class="score-card ${statusClass}">
+        <div class="sc-status ${statusClass}">${statusText}</div>
+        <div class="sc-teams">
+          <div class="sc-team">
+            <img src="${g.awayTeam.logo}" onerror="this.style.display='none'" alt="${g.awayTeam.abbrev}">
+            <div class="sc-team-abbrev">${g.awayTeam.abbrev}</div>
+            <div class="sc-score${awayWin && isFinal ? ' winning' : ''}">${g.awayTeam.score ?? '—'}</div>
+          </div>
+          <div class="sc-vs">vs</div>
+          <div class="sc-team">
+            <img src="${g.homeTeam.logo}" onerror="this.style.display='none'" alt="${g.homeTeam.abbrev}">
+            <div class="sc-team-abbrev">${g.homeTeam.abbrev}</div>
+            <div class="sc-score${homeWin && isFinal ? ' winning' : ''}">${g.homeTeam.score ?? '—'}</div>
+          </div>
+        </div>
+        ${seriesHTML ? `<div class="sc-series">${seriesHTML}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function fetchScoresForDate(dateStr, elId) {
+  const el = document.getElementById(elId);
   try {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-    const isHosted  = location.hostname !== 'localhost' && location.protocol !== 'file:';
-    const fetchUrl  = isHosted
+    const isHosted = location.hostname !== 'localhost' && location.protocol !== 'file:';
+    const fetchUrl = isHosted
       ? `/.netlify/functions/nhl-scores?date=${dateStr}`
       : `https://api-web.nhle.com/v1/score/${dateStr}`;
-
     const r = await fetch(fetchUrl, { cache:'no-store' });
     if (!r.ok) throw new Error('no data');
     const d = await r.json();
-
-    if (!d.games || d.games.length === 0) {
-      el.innerHTML = `<div style="color:var(--muted);font-size:.9rem;padding:8px">No games scheduled today.</div>`;
-      return;
-    }
-
-    el.innerHTML = d.games.map(g => {
-      const awayWin = g.awayTeam.score > g.homeTeam.score;
-      const homeWin = g.homeTeam.score > g.awayTeam.score;
-      const isLive  = g.gameState === 'LIVE' || g.gameState === 'CRIT';
-      const isFinal = g.gameState === 'OFF' || g.gameState === 'FINAL';
-      const isPre   = g.gameState === 'PRE'  || g.gameState === 'FUT';
-
-      // Status label
-      let statusText = '';
-      let statusClass = 'pre';
-      if (isFinal) {
-        const ot = g.gameOutcome?.lastPeriodType;
-        statusText = 'Final' + (ot === 'OT' ? '/OT' : ot === 'SO' ? '/SO' : '');
-        statusClass = 'final';
-      } else if (isLive) {
-        const pd = g.periodDescriptor;
-        const perLabel = pd?.periodType === 'OT' ? 'OT'
-                       : pd?.periodType === 'SO' ? 'SO'
-                       : `P${pd?.number || g.period}`;
-        statusText = `🔴 LIVE · ${perLabel} ${g.clock?.timeRemaining || ''}`;
-        statusClass = 'live';
-      } else {
-        // Pre-game — show local start time
-        const start = new Date(g.startTimeUTC);
-        statusText = start.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
-        statusClass = 'pre';
-      }
-
-      // Series record
-      const s = g.seriesStatus;
-      let seriesHTML = '';
-      if (s) {
-        const topName  = s.topSeedTeamAbbrev;
-        const botName  = s.bottomSeedTeamAbbrev;
-        const topW = s.topSeedWins, botW = s.bottomSeedWins;
-        const leader = topW > botW ? topName : botW > topW ? botName : null;
-        seriesHTML = leader
-          ? `<strong>${leader}</strong> leads series ${Math.max(topW,botW)}-${Math.min(topW,botW)}`
-          : `Series tied ${topW}-${botW}`;
-      }
-
-      return `
-        <div class="score-card ${statusClass}">
-          <div class="sc-status ${statusClass}">${statusText}</div>
-          <div class="sc-teams">
-            <div class="sc-team">
-              <img src="${g.awayTeam.logo}" onerror="this.style.display='none'" alt="${g.awayTeam.abbrev}">
-              <div class="sc-team-abbrev">${g.awayTeam.abbrev}</div>
-              <div class="sc-score${awayWin && isFinal ? ' winning' : ''}">${g.awayTeam.score ?? '—'}</div>
-            </div>
-            <div class="sc-vs">vs</div>
-            <div class="sc-team">
-              <img src="${g.homeTeam.logo}" onerror="this.style.display='none'" alt="${g.homeTeam.abbrev}">
-              <div class="sc-team-abbrev">${g.homeTeam.abbrev}</div>
-              <div class="sc-score${homeWin && isFinal ? ' winning' : ''}">${g.homeTeam.score ?? '—'}</div>
-            </div>
-          </div>
-          ${seriesHTML ? `<div class="sc-series">${seriesHTML}</div>` : ''}
-        </div>`;
-    }).join('');
-
+    el.innerHTML = buildScoreCards(d.games);
   } catch(e) {
     el.innerHTML = `<div style="color:var(--muted);font-size:.9rem;padding:8px">Scores unavailable — open in browser for live data.</div>`;
   }
+}
+
+function fetchScores() {
+  fetchScoresForDate(getDateStr(-1), 'scores-yesterday');
+  fetchScoresForDate(getDateStr(0),  'scores-today');
+  fetchScoresForDate(getDateStr(1),  'scores-tomorrow');
 }
 
 // ================================================================
